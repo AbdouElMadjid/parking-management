@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Véhicules Sortis</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <form action="/visite/search" method="GET" class="mb-3">
+            <div class="input-group">
+                <input 
+                    type="search" 
+                    name="query" 
+                    class="form-control" 
+                    placeholder="Rechercher par plaque, ticket ou email" 
+                    value="" 
+                    required 
+                />
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </div>
+            <!-- <% if (typeof message !== "undefined") { %>
+                <p class="text-danger mt-2"><%= message %></p>
+            <% } %> -->
+        </form>
+        <div class="text-center mb-4">
+            <a href="/" class="btn btn-primary mr-2">Add a visit</a>
+            <a href="/visite/exited" class="btn btn-secondary mr-2">vehicles exted</a>
+            <a href="/visite/present" class="btn btn-warning mr-2">Vehicles in the park</a>
+            <a href="/visites" class="btn btn-success">All visit</a>
+            <!-- <a href="/visite/search" class="btn btn-info">Rechercher une Visite</a> -->
+
+        </div>
+        <h1 class="text-center">Complete List of vehicles exted</h1>
+
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Numéro de Plaque</th>
+                    <th>Ticket</th>
+                    <td>email</td>
+                    <th>Date Arrived</th>
+                    <th>Date exeted</th>
+                    <th>Montant</th>
+
+                    <th>Action</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <% visites.forEach((visite, index) => { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= visite.plateNumber %></td>
+                        <td><%= visite.ticketNumber %></td>
+                        <td><%= visite.email %></td>
+                        <td><%= new Date(visite.createdAt).toLocaleString() %></td>
+                        <td><%= new Date(visite.updatedAt).toLocaleString() %></td>
+                        <td><%= visite.amount %> FC</td>
+                        <td>
+                            <% if (visite.status === 0) { %>
+                                <form action="/visite/mark-exit/<%= visite.id %>" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Marquer comme sortie
+                                    </button>
+                                </form>
+                            <% } else { %>
+                                <button class="btn btn-secondary btn-sm" disabled>Already exited</button>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <a href="/visite/all" class="btn btn-primary mt-3">Retour à la liste complète</a>
+    </div>
+</body>
+</html>

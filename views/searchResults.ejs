@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche de Visites</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Recherche de Visites</h1>
+        <form action="/visite/search" method="GET" class="mt-4">
+            <div class="input-group">
+                <input type="text" name="query" class="form-control" placeholder="Rechercher par plaque, ticket, ou email" value="<%= query || '' %>" required>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </div>
+        </form>
+
+        <% if (visites.length > 0) { %>
+            <table class="table table-striped mt-4">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Numéro de Plaque</th>
+                        <th>Ticket</th>
+                        <th>Email</th>
+                        <th>Heure d'Arrivée</th>
+                        <th>Heure de Sortie</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% visites.forEach((visite, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= visite.plateNumber %></td>
+                            <td><%= visite.ticketNumber %></td>
+                            <td><%= visite.email %></td>
+                            <td><%= new Date(visite.createdAt).toLocaleString() %></td>
+                            <td>
+                                <% if (visite.status === 0) { %>
+                                    En Parking
+                                <% } else { %>
+                                    <%= new Date(visite.updatedAt).toLocaleString() %>
+                                <% } %>
+                            </td>
+                            <td><%= visite.status === 0 ? "En Parking" : "Sorti" %></td>
+                            <td>
+                                <% if (visite.status === 0) { %>
+                                    <form action="/visite/update/<%= visite.id %>" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn btn-success btn-sm">Marquer comme sorti</button>
+                                    </form>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="mt-4 text-center">Aucun résultat trouvé pour "<%= query %>".</p>
+        <% } %>
+        <a href="/visite/all" class="btn btn-secondary mt-3">Retour à la liste complète</a>
+    </div>
+</body>
+</html>

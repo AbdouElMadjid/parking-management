@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Véhicules Présents</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <form action="/visite/search" method="GET" class="mb-3">
+            <div class="input-group">
+                <input 
+                    type="search" 
+                    name="query" 
+                    class="form-control" 
+                    placeholder="Rechercher par plaque, ticket ou email" 
+                    value="" 
+                    required 
+                />
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </div>
+            </div>
+            <!-- <% if (typeof message !== "undefined") { %>
+                <p class="text-danger mt-2"><%= message %></p>
+            <% } %> -->
+        </form>
+        <div class="text-center mb-4">
+            <a href="/" class="btn btn-primary mr-2">Add a visit</a>
+            <a href="/visite/exited" class="btn btn-secondary mr-2">vehicles exted</a>
+            <a href="/visite/present" class="btn btn-warning mr-2">Vehicles in the park</a>
+            <a href="/visites" class="btn btn-success mr-2">All visit</a>
+            <!-- <a href="/visite/search" class="btn btn-info">Rechercher une Visite</a> -->
+
+        </div>
+        <h1 class="text-center">Complete List of Vehicles presents in the Park</h1>
+
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Numéro de Plaque</th>
+                    <th>Ticket</th>
+                    <th>Date arrived</th>
+                    <th>Amount</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <% visites.forEach((visite, index) => { %>
+                    <tr class="visite-row" data-start-time="<%= visite.createdAt %>">
+                        <td><%= index + 1 %></td>
+                        <td><%= visite.plateNumber %></td>
+                        <td><%= visite.ticketNumber %></td>
+                        <td><%= new Date(visite.createdAt).toLocaleString() %></td>
+                        <!-- <td>
+                            <%= visite.status === 0 ? 'N/A' : visite.amount %>
+                        </td> -->
+                        <td class="amount-cell">Calcul en cours...</td> <!-- Cellule mise à jour dynamiquement -->
+                        <td>
+                            <% if (visite.status === 0) { %>
+                                <form action="/visite/mark-exit/<%= visite.id %>" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Set Like Exited
+                                    </button>
+                                </form>
+                            <% } else { %>
+                                <button class="btn btn-secondary btn-sm" disabled>Déjà sortie</button>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+        <a href="/visite/all" class="btn btn-primary mt-3">Retour à la liste complète</a>
+    </div>
+
+    <script>
+        // Fonction pour calculer le montant en fonction des minutes écoulées
+        function calculateAmount(startDate) {
+            const now = new Date(); // Heure actuelle
+            const start = new Date(startDate); // Heure de l'enregistrement
+            const diffInMinutes = Math.floor((now - start) / (1000 * 60)); // Différence en minutes
+    
+            if (diffInMinutes <= 60) {
+                return 1000; // Moins d'une heure = 1000 FC
+            } else {
+                const additionalHours = Math.ceil((diffInMinutes - 60) / 60); // Heures supplémentaires
+                return 1000 + additionalHours * 500; // 500 FC pour chaque heure supplémentaire
+            }
+        }
+    
+        // Fonction pour mettre à jour les montants affichés en temps réel
+        function updateAmounts() {
+            const rows = document.querySelectorAll('.visite-row'); // Chaque ligne de visite
+            rows.forEach(row => {
+                const startTime = row.getAttribute('data-start-time'); // Heure de début
+                const amountCell = row.querySelector('.amount-cell'); // Cellule du montant
+                const amount = calculateAmount(startTime); // Calcul du montant
+                amountCell.textContent = amount + " FC"; // Mise à jour de la cellule
+            });
+        }
+    
+        // Mettre à jour toutes les 15 secondes
+        setInterval(updateAmounts, 15000); // Actualisation périodique
+        updateAmounts(); // Mise à jour initiale
+    </script>
+    
+</body>
+</html>
